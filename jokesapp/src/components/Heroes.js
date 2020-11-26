@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import md5 from 'md5'
-import {Card, CardDeck, Container, Row, Col} from 'react-bootstrap'
+import {Card, CardDeck, Container, Col, Row} from 'react-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const publicK = process.env.REACT_APP_PUBLIC_KEY
@@ -13,12 +13,10 @@ const params = {
 }
 
 function Hero(props) {
-    const img_url = "https://res.cloudinary.com/heroespatches/image/upload/v1546970566/hero/imperius.png"
-    //const img_url = new URL(props["img"])
-    //img_url.search = new URLSearchParams(params).toString()
+    const img_url = new URL(props["img"] + "." + props["format"])
     return (
         <Col>
-            <Card style={{width:'18rem', marginTop: "10px"}}>
+            <Card style={{width:'18rem', marginBottom: "10px"}}>
                 <Card.Img variant="top" src={img_url}/>
                 <Card.Body>
                     <Card.Title>{props["title"]}</Card.Title>
@@ -44,13 +42,12 @@ function Heroes() {
                 setHeroes(localStorage.getItem("heroes"));
             }
         } else {
-            
             const url =  new URL("https://gateway.marvel.com:443/v1/public/characters")
             url.search = new URLSearchParams(params).toString()
             fetch(url).then(res=>res.json()).then(res=>{
                 setHeader("Heroes")
                 setHeroes(Array.from(res["data"]["results"]))
-                localStorage.setItem("heroes", res.value)
+                localStorage.setItem("heroes", Array.from(res["data"]["results"]))
             })
         }
     }, [])
@@ -65,6 +62,7 @@ function Heroes() {
                         img={e["thumbnail"]["path"]}
                         title={e["name"]}
                         desc={e["description"]}
+                        format={e["thumbnail"]["extension"]}
                     />)
                 })}
             </CardDeck>
